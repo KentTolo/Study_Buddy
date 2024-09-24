@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Buddy - Timetable</title>
+    <link rel="stylesheet" href="../sidebar.css">
+    <link rel="stylesheet" href="../main.css">
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            background-color: #A8E1C5;
+            padding: 20px;
+            width: 250px;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            font-size: 18px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar ul li a span {
+            margin-right: 10px;
+        }
+
+        .sidebar ul li a.active {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Main Content */
+        .content {
+            margin-left: 270px;
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        /* Add Subject Form Styling */
+        .add-subject-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-subject-form input, .add-subject-form select, .add-subject-form button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .add-subject-form input, .add-subject-form select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .add-subject-form button {
+            background-color: #A8E1C5;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            flex: 0.5;
+            min-width: 150px;
+        }
+
+        .add-subject-form button:hover {
+            background-color: #91cba3;
+        }
+
+        /* Timetable Table Styling */
+        .timetable-container {
+            width: 100%;
+        }
+
+        .timetable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .timetable th, .timetable td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .timetable th {
+            background-color: #A8E1C5;
+            color: #fff;
+        }
+
+        .timetable td {
+            background-color: #fff;
+        }
+
+        /* Responsive Table Adjustments */
+        @media (max-width: 768px) {
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .sidebar {
+                width: 100px;
+                padding: 10px;
+            }
+
+            .sidebar ul li a {
+                font-size: 14px;
+            }
+
+            .add-subject-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul>
+                <li><a href="timetable.html" class="active"><span class="icon">📅</span>Timetable</a></li>
+                <li><a href="calendar.html"><span class="icon">📆</span>Calendar</a></li>
+                <li><a href="tasks.html"><span class="icon">📝</span>Tasks</a></li>
+                <li><a href="notes.html"><span class="icon">🗒️</span>Notes</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1>Timetable</h1>
+
+            <!-- Add Subject Form -->
+            <div class="add-subject-form">
+                <input type="text" id="subject-name" placeholder="Subject Name" required>
+                <select id="day-select">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                </select>
+                <input type="time" id="subject-time" required>
+                <button onclick="addSubject()">Add Subject</button>
+            </div>
+
+            <!-- Timetable -->
+            <div class="timetable-container">
+                <table class="timetable">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timetable-body">
+                        <!-- Time slots from 07:00 to 18:00 -->
+                        <tr>
+                            <td>07:00 - 08:00</td>
+                            <td id="monday-0700"></td>
+                            <td id="tuesday-0700"></td>
+                            <td id="wednesday-0700"></td>
+                            <td id="thursday-0700"></td>
+                            <td id="friday-0700"></td>
+                        </tr>
+                        <tr>
+                            <td>08:00 - 09:00</td>
+                            <td id="monday-0800"></td>
+                            <td id="tuesday-0800"></td>
+                            <td id="wednesday-0800"></td>
+                            <td id="thursday-0800"></td>
+                            <td id="friday-0800"></td>
+                        </tr>
+                        <tr>
+                            <td>09:00 - 10:00</td>
+                            <td id="monday-0900"></td>
+                            <td id="tuesday-0900"></td>
+                            <td id="wednesday-0900"></td>
+                            <td id="thursday-0900"></td>
+                            <td id="friday-0900"></td>
+                        </tr>
+                        <!-- Add more rows for the rest of the day (up to 6 PM) -->
+                        <tr>
+                            <td>10:00 - 11:00</td>
+                            <td id="monday-1000"></td>
+                            <td id="tuesday-1000"></td>
+                            <td id="wednesday-1000"></td>
+                            <td id="thursday-1000"></td>
+                            <td id="friday-1000"></td>
+                        </tr>
+                        <tr>
+                            <td>11:00 - 12:00</td>
+                            <td id="monday-1100"></td>
+                            <td id="tuesday-1100"></td>
+                            <td id="wednesday-1100"></td>
+                            <td id="thursday-1100"></td>
+                            <td id="friday-1100"></td>
+                        </tr>
+                        <tr>
+                            <td>12:00 - 13:00</td>
+                            <td id="monday-1200"></td>
+                            <td id="tuesday-1200"></td>
+                            <td id="wednesday-1200"></td>
+                            <td id="thursday-1200"></td>
+                            <td id="friday-1200"></td>
+                        </tr>
+                        <tr>
+                            <td>13:00 - 14:00</td>
+                            <td id="monday-1400"></td>
+                            <td id="tuesday-1400"></td>
+                            <td id="wednesday-1400"></td>
+                            <td id="thursday-1400"></td>
+                            <td id="friday-1400"></td>
+                        </tr>
+                        <tr></tr>
+                            <td>14:00 - 15:00</td>
+                            <td id="monday-1400"></td>
+                            <td id="tuesday-1400"></td>
+                            <td id="wednesday-1400"></td>
+                            <td id="thursday-1400"></td>
+                            <td id="friday-1400"></td>
+                        </tr>
+                        <tr></tr>
+                            <td>15:00 - 16:00</td>
+                            <td id="monday-1500"></td>
+                            <td id="tuesday-1500"></td>
+                            <td id="wednesday-1500"></td>
+                            <td id="thursday-1500"></td>
+                            <td id="friday-1500"></td>
+                        </tr>
+                        <tr></tr>
+                            <td>16:00 - 17:00</td>
+                            <td id="monday-1600"></td>
+                            <td id="tuesday-1600"></td>
+                            <td id="wednesday-1600"></td>
+                            <td id="thursday-1600"></td>
+                            <td id="friday-1600"></td>
+                        </tr>
+                        <!-- Continue adding rows until 6 PM -->
+                        <tr>
+                            <td>17:00 - 18:00</td>
+                            <td id="monday-1700"></td>
+                            <td id="tuesday-1700"></td>
+                            <td id="wednesday-1700"></td>
+                            <td id="thursday-1700"></td>
+                            <td id="friday-1700"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript for Adding Subject -->
+    <script>
+        // Function to add a subject to the timetable
+        function addSubject() {
+            const subjectName = document.getElementById('subject-name').value;
+            const day = document.getElementById('day-select').value;
+            const time = document.getElementById('subject-time').value;
+
+            if (!subjectName || !time) {
+                alert('Please fill in all the fields');
+                return;
+            }
+
+            const [hour, minute] = time.split(':');
+            const id = `${day.toLowerCase()}-${hour}00`;
+            const cell = document.getElementById(id);
+
+            if (cell) {
+                cell.textContent = subjectName;
+            } else {
+                alert('Invalid time slot');
+            }
+
+            // Clear the form inputs after submission
+            document.getElementById('subject-name').value = '';
+            document.getElementById('subject-time').value = '';
+        }
+    </script>
+</body>
+</html>

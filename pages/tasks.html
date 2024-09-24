@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Buddy - Tasks</title>
+    <link rel="stylesheet" href="../sidebar.css">
+    <link rel="stylesheet" href="../main.css">
+    <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            background-color: #A8E1C5;
+            padding: 20px;
+            width: 250px;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            font-size: 18px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar ul li a span {
+            margin-right: 10px;
+        }
+
+        .sidebar ul li a.active {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Main content */
+        .content {
+            margin-left: 270px;
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        /* Add Task Form Styling */
+        .add-task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-task-form input, .add-task-form button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .add-task-form button {
+            background-color: #A8E1C5;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .add-task-form button:hover {
+            background-color: #91cba3;
+        }
+
+        /* Tasks Display Section */
+        .tasks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .task h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .task .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff6666;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .task .delete-btn:hover {
+            background-color: #e04e4e;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .sidebar {
+                width: 100px;
+                padding: 10px;
+            }
+
+            .sidebar ul li a {
+                font-size: 14px;
+            }
+
+            .add-task-form, .task {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul>
+                <li><a href="timetable.html"><span class="icon">📅</span>Timetable</a></li>
+                <li><a href="calendar.html"><span class="icon">📆</span>Calendar</a></li>
+                <li><a href="tasks.html" class="active"><span class="icon">📝</span>Tasks</a></li>
+                <li><a href="notes.html"><span class="icon">🗒️</span>Notes</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1>Tasks</h1>
+
+            <!-- Add Task Form -->
+            <div class="add-task-form">
+                <h2>Add a New Task</h2>
+                <input type="text" id="task-title" placeholder="Task Title" required>
+                <button onclick="addTask()">Add Task</button>
+            </div>
+
+            <!-- Tasks Display Section -->
+            <div class="tasks-container" id="tasks-container">
+                <!-- Dynamic tasks will be added here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript for Adding and Displaying Tasks -->
+    <script>
+        // Function to add a task to the tasks section
+        function addTask() {
+            const taskTitle = document.getElementById('task-title').value;
+
+            if (!taskTitle) {
+                alert('Please enter a task title.');
+                return;
+            }
+
+            const tasksContainer = document.getElementById('tasks-container');
+
+            // Create a new task element
+            const newTask = document.createElement('div');
+            newTask.classList.add('task');
+
+            newTask.innerHTML = `
+                <h3>${taskTitle}</h3>
+                <button class="delete-btn" onclick="deleteTask(this)">Delete</button>
+            `;
+
+            // Append the new task to the container
+            tasksContainer.appendChild(newTask);
+
+            // Clear the form
+            document.getElementById('task-title').value = '';
+        }
+
+        // Function to delete a task
+        function deleteTask(deleteBtn) {
+            const taskToDelete = deleteBtn.parentElement;
+            taskToDelete.remove();
+        }
+    </script>
+</body>
+</html>

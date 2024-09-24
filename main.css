@@ -1,0 +1,42 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #F4F4F9;
+}
+
+.container {
+  display: flex;
+}
+
+.content {
+  margin-left: 270px; /* Adjust according to sidebar width */
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.timetable, .task-list, .notes-list {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.timetable th, .timetable td, .task-list th, .task-list td, .notes-list th, .notes-list td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.timetable th, .task-list th, .notes-list th {
+  background-color: #A8E1C5;
+  color: black;
+}
+
+.timetable td, .task-list td, .notes-list td {
+  background-color: #fff;
+  color: #333;
+}
