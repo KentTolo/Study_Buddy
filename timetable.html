@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Timetable</title>
+    <style>
+        /* Combined CSS styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #F4F4F9;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background-color: #A8E1C5;
+            width: 250px;
+            height: 100vh;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-radius: 0 20px 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 40px;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: black;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 30px 0 0 30px;
+        }
+
+        .sidebar ul li a.active {
+            background-color: white;
+            color: #000;
+            border-radius: 50px 0 0 50px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar ul li a .icon {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        /* Content Styles */
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            width: calc(100% - 270px);
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .add-subject-form {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .add-subject-form select, 
+        .add-subject-form input {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .add-subject-form button {
+            background-color: #A8E1C5;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-subject-form button:hover {
+            background-color: #8ed1b2;
+        }
+
+        .timetable {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timetable th, 
+        .timetable td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .timetable th {
+            background-color: #A8E1C5;
+            color: black;
+            font-weight: bold;
+        }
+
+        .timetable td {
+            background-color: #fff;
+            color: #333;
+        }
+
+        .timetable-cell {
+            position: relative;
+            min-height: 40px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+
+        .timetable-cell:hover .delete-btn {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li><a href="timetable.html" class="active"><span class="icon">📅</span>Timetable</a></li>
+                <li><a href="calendar.html"><span class="icon">📆</span>Calendar</a></li>
+                <li><a href="tasks.html"><span class="icon">📝</span>Tasks</a></li>
+                <li><a href="notes.html"><span class="icon">🗒️</span>Notes</a></li>
+            </ul>
+        </div>
+        
+        <div class="content">
+            <h1>Timetable</h1>
+            
+            <div class="add-subject-form">
+                <select id="day">
+                    <option value="monday">Monday</option>
+                    <option value="tuesday">Tuesday</option>
+                    <option value="wednesday">Wednesday</option>
+                    <option value="thursday">Thursday</option>
+                    <option value="friday">Friday</option>
+                </select>
+                
+                <select id="time">
+                    <option value="07:00 - 08:00">07:00 - 08:00</option>
+                    <option value="08:00 - 09:00">08:00 - 09:00</option>
+                    <option value="09:00 - 10:00">09:00 - 10:00</option>
+                    <option value="10:00 - 11:00">10:00 - 11:00</option>
+                    <option value="11:00 - 12:00">11:00 - 12:00</option>
+                    <option value="12:00 - 13:00">12:00 - 13:00</option>
+                    <option value="13:00 - 14:00">13:00 - 14:00</option>
+                    <option value="14:00 - 15:00">14:00 - 15:00</option>
+                    <option value="15:00 - 16:00">15:00 - 16:00</option>
+                    <option value="16:00 - 17:00">16:00 - 17:00</option>
+                </select>
+                
+                <input type="text" id="subject" placeholder="Subject Name">
+                <button onclick="addSubject()">Add Subject</button>
+            </div>
+            
+            <table class="timetable">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                    </tr>
+                </thead>
+                <tbody id="timetableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Initialize timetable data structure
+        let timetableData = {};
+
+        // Load saved data on page load
+        window.onload = function() {
+            loadTimetable();
+            renderTimetable();
+        };
+
+        function loadTimetable() {
+            const savedData = localStorage.getItem('timetableData');
+            if (savedData) {
+                timetableData = JSON.parse(savedData);
+            } else {
+                // Initialize empty timetable
+                const times = [
+                    "07:00 - 08:00", "08:00 - 09:00", "09:00 - 10:00",
+                    "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00",
+                    "13:00 - 14:00", "14:00 - 15:00", "15:00 - 16:00",
+                    "16:00 - 17:00"
+                ];
+                
+                const days = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+                
+                times.forEach(time => {
+                    timetableData[time] = {};
+                    days.forEach(day => {
+                        timetableData[time][day] = "";
+                    });
+                });
+                
+                saveTimetable();
+            }
+        }
+
+        function saveTimetable() {
+            localStorage.setItem('timetableData', JSON.stringify(timetableData));
+        }
+
+        function renderTimetable() {
+            const tbody = document.getElementById('timetableBody');
+            tbody.innerHTML = '';
+            
+            Object.keys(timetableData).forEach(time => {
+                const row = document.createElement('tr');
+                
+                // Add time cell
+                const timeCell = document.createElement('td');
+                timeCell.textContent = time;
+                row.appendChild(timeCell);
+                
+                // Add day cells
+                ["monday", "tuesday", "wednesday", "thursday", "friday"].forEach(day => {
+                    const cell = document.createElement('td');
+                    cell.className = 'timetable-cell';
+                    
+                    const subject = timetableData[time][day];
+                    if (subject) {
+                        cell.textContent = subject;
+                        
+                        // Add delete button
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.innerHTML = '×';
+                        deleteBtn.onclick = () => deleteSubject(time, day);
+                        cell.appendChild(deleteBtn);
+                    }
+                    
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function addSubject() {
+            const day = document.getElementById('day').value;
+            const time = document.getElementById('time').value;
+            const subject = document.getElementById('subject').value.trim();
+            
+            if (!subject) {
+                alert('Please enter a subject name');
+                return;
+            }
+            
+            timetableData[time][day] = subject;
+            saveTimetable();
+            renderTimetable();
+            
+            // Clear input
+            document.getElementById('subject').value = '';
+        }
+
+        function deleteSubject(time, day) {
+            timetableData[time][day] = "";
+            saveTimetable();
+            renderTimetable();
+        }
+    </script>
+</body>
+</html>

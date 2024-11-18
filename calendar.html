@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Buddy - Calendar</title>
+    <link rel="stylesheet" href="../sidebar.css">
+    <link rel="stylesheet" href="../main.css">
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            background-color: #A8E1C5;
+            padding: 20px;
+            width: 250px;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            font-size: 18px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar ul li a span {
+            margin-right: 10px;
+        }
+
+        .sidebar ul li a.active {
+            font-weight: bold;
+            color: #000000;
+        }
+
+        /* Main content */
+        .content {
+            margin-left: 270px;
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        /* Calendar styling */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            font-size: 24px;
+        }
+
+        .calendar-header button {
+            background-color: #A8E1C5;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .calendar-header button:hover {
+            background-color: #91cba3;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 10px;
+        }
+
+        .day {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+            height: 100px;
+            overflow: hidden;
+        }
+
+        .day h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .event {
+            font-size: 12px;
+            background-color: #A8E1C5;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        /* Event Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal input, .modal button {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+
+        .modal button {
+            background-color: #A8E1C5;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #91cba3;
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .sidebar {
+                width: 100px;
+                padding: 10px;
+            }
+
+            .sidebar ul li a {
+                font-size: 14px;
+            }
+
+            .calendar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul>
+                <!--<li><a href="#"><span class="icon"></span>Thabo</a></li> -->
+                <li><a href="timetable.html"><span class="icon">📅</span>Timetable</a></li>
+                <li><a href="calendar.html" class="active"><span class="icon">📆</span>Calendar</a></li>
+                <li><a href="tasks.html"><span class="icon">📝</span>Tasks</a></li>
+                <li><a href="notes.html"><span class="icon">🗒️</span>Notes</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1>Calendar</h1>
+
+            <div class="calendar-header">
+                <button onclick="prevMonth()">Previous</button>
+                <h2 id="currentMonth"></h2>
+                <button onclick="nextMonth()">Next</button>
+            </div>
+
+            <!-- Calendar grid -->
+            <div class="calendar" id="calendar-grid"></div>
+        </main>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="modal" id="modal">
+        <h2>Add Event</h2>
+        <input type="text" id="event-title" placeholder="Event Title">
+        <button onclick="addEvent()">Add Event</button>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- JavaScript -->
+    <script>
+        let currentDate = new Date();
+        let currentDay;
+        let events = {};
+
+        // Function to open the modal
+        function openModal(day) {
+            currentDay = day;
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        // Function to add an event
+        function addEvent() {
+            const eventTitle = document.getElementById('event-title').value;
+
+            if (!eventTitle) {
+                alert('Please enter an event title.');
+                return;
+            }
+
+            const monthYear = `${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
+
+            // Initialize the day and month-year event container if not present
+            if (!events[monthYear]) events[monthYear] = {};
+            if (!events[monthYear][currentDay]) events[monthYear][currentDay] = [];
+
+            events[monthYear][currentDay].push(eventTitle);
+
+            renderCalendar();
+
+            // Close the modal and clear the input field
+            closeModal();
+            document.getElementById('event-title').value = '';
+        }
+
+        // Function to render the calendar
+        function renderCalendar() {
+            const month = currentDate.getMonth();
+            const year = currentDate.getFullYear();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayIndex = new Date(year, month, 1).getDay();
+
+            const calendarGrid = document.getElementById('calendar-grid');
+            calendarGrid.innerHTML = ''; // Clear the calendar
+
+            // Set current month
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            document.getElementById('currentMonth').innerText = `${monthNames[month]} ${year}`;
+
+            // Add blank days for the first week
+            for (let i = 0; i < firstDayIndex; i++) {
+                const blankDay = document.createElement('div');
+                blankDay.classList.add('day');
+                calendarGrid.appendChild(blankDay);
+            }
+
+            // Add actual days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('day');
+                dayDiv.innerHTML = `<h3>${day}</h3>`;
+
+                // Show events for the day
+                const monthYear = `${month + 1}-${year}`;
+                if (events[monthYear] && events[monthYear][day]) {
+                    events[monthYear][day].forEach(event => {
+                        const eventDiv = document.createElement('div');
+                        eventDiv.classList.add('event');
+                        eventDiv.innerText = event;
+                        dayDiv.appendChild(eventDiv);
+                    });
+                }
+
+                // Make day clickable to add event
+                dayDiv.onclick = () => openModal(day);
+
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        // Navigate to the next month
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        // Navigate to the previous month
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        // Close modal on overlay click
+        document.getElementById('overlay').onclick = closeModal;
+
+        // Initial render
+        renderCalendar();
+    </script>
+</body>
+</html>

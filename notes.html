@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes Manager</title>
+    <!-- Include Quill for rich text editing -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #F4F4F9;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            width: calc(100% - 270px);
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .sidebar {
+            background-color: #A8E1C5;
+            width: 250px;
+            height: 100vh;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-radius: 0 20px 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: black;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 30px 0 0 30px;
+        }
+
+        .sidebar ul li a.active {
+            background-color: white;
+            color: #000;
+            border-radius: 50px 0 0 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar ul li a .icon {
+            margin-right: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        .add-note-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #editor-container {
+            height: 200px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background-color: #A8E1C5;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #8ed1b0;
+        }
+
+        .notes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .note-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .note-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .delete-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #4dabf7;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .note-content {
+            margin-top: 10px;
+        }
+
+        .note-meta {
+            color: #888;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li><a href="timetable.html"><span class="icon">📅</span>Timetable</a></li>
+                <li><a href="calendar.html"><span class="icon">📆</span>Calendar</a></li>
+                <li><a href="tasks.html"><span class="icon">📝</span>Tasks</a></li>
+                <li><a href="notes.html" class="active"><span class="icon">🗒️</span>Notes</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <h1>Notes</h1>
+
+            <input type="text" id="searchNotes" class="search-bar" placeholder="Search notes...">
+
+            <div class="add-note-form">
+                <h2>Add a New Note</h2>
+                <form id="noteForm">
+                    <div class="form-group">
+                        <label for="noteTitle">Title</label>
+                        <input type="text" id="noteTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editor-container">Content</label>
+                        <div id="editor-container"></div>
+                    </div>
+                    <button type="submit" class="btn">Add Note</button>
+                </form>
+            </div>
+
+            <div id="notes-container" class="notes-container">
+                <!-- Notes will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Quill editor
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        class NotesManager {
+            constructor() {
+                this.notes = JSON.parse(localStorage.getItem('notes')) || [];
+                this.form = document.getElementById('noteForm');
+                this.container = document.getElementById('notes-container');
+                this.searchInput = document.getElementById('searchNotes');
+                
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                this.searchInput.addEventListener('input', () => this.renderNotes());
+                this.renderNotes();
+            }
+
+            handleSubmit(e) {
+                e.preventDefault();
+                
+                const note = {
+                    id: Date.now(),
+                    title: document.getElementById('noteTitle').value,
+                    content: quill.root.innerHTML,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+
+                this.notes.push(note);
+                this.saveNotes();
+                this.renderNotes();
+                this.form.reset();
+                quill.setContents([]);
+            }
+
+            deleteNote(noteId) {
+                this.notes = this.notes.filter(note => note.id !== noteId);
+                this.saveNotes();
+                this.renderNotes();
+            }
+
+            editNote(noteId) {
+                const note = this.notes.find(note => note.id === noteId);
+                if (note) {
+                    document.getElementById('noteTitle').value = note.title;
+                    quill.root.innerHTML = note.content;
+                    this.deleteNote(noteId);
+                    window.scrollTo(0, 0);
+                }
+            }
+
+            saveNotes() {
+                localStorage.setItem('notes', JSON.stringify(this.notes));
+            }
+
+            renderNotes() {
+                this.container.innerHTML = '';
+                
+                let filteredNotes = this.notes;
+                const searchTerm = this.searchInput.value.toLowerCase();
+                
+                if (searchTerm) {
+                    filteredNotes = this.notes.filter(note => 
+                        note.title.toLowerCase().includes(searchTerm) ||
+                        note.content.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // Sort notes by creation date (newest first)
+                filteredNotes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                filteredNotes.forEach(note => {
+                    const noteElement = document.createElement('div');
+                    noteElement.className = 'note-card';
+                    
+                    const createdAt = new Date(note.createdAt).toLocaleString();
+
+                    noteElement.innerHTML = `
+                        <div class="note-header">
+                            <h3 class="note-title">${note.title}</h3>
+                            <div class="note-actions">
+                                <button class="edit-btn" onclick="notesManager.editNote(${note.id})">
+                                    Edit
+                                </button>
+                                <button class="delete-btn" onclick="notesManager.deleteNote(${note.id})">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                        <div class="note-content">
+                            ${note.content}
+                        </div>
+                        <div class="note-meta">
+                            Created: ${createdAt}
+                        </div>
+                    `;
+
+                    this.container.appendChild(noteElement);
+                });
+            }
+        }
+
+        // Initialize the notes manager
+        const notesManager = new NotesManager();
+    </script>
+</body>
+</html>
